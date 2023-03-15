@@ -14,11 +14,17 @@ public class Player : MonoBehaviour
     public float maxSlope = 0.5f;
     public int maxJumps = 2;
     int currentJumps;
+    public int collectableCount;
+    SpriteRenderer spriteRenderer;
+
+    Vector2 checkpointPosition;
 
     void Start()
     {
         body = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         verticalForce.y = jumpForce;
+        checkpointPosition = transform.position;
     }
 
     void Update()
@@ -37,6 +43,20 @@ public class Player : MonoBehaviour
                 currentJumps++;
             }
         }
+
+        if(horizontal > 0)
+            spriteRenderer.flipX = true;
+        else if(horizontal < 0)
+            spriteRenderer.flipX= false;
+        if(!isOnGround)
+        {
+            if (body.velocity.y < 0)
+                spriteRenderer.flipY = true;
+            else if (body.velocity.y > 0)
+                spriteRenderer.flipY= false;
+        }
+        if (isOnGround)
+            spriteRenderer.flipY = false;
     }
 
     bool CanJump()
@@ -47,6 +67,29 @@ public class Player : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         CheckIfOnGround(collision);
+
+        if(collision.gameObject.CompareTag("Death"))
+        {
+            transform.position = checkpointPosition;
+            body.velocity = Vector2.zero;
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Checkpoint"))
+        {
+            checkpointPosition = collision.gameObject.transform.position;
+        }
+
+        if(collision.gameObject.CompareTag("Collectable"))
+        {
+            collectableCount++;
+        }
+        if(collision.gameObject.CompareTag("Jump Pad"))
+        {
+            isOnGround = false;
+        }
     }
 
     void CheckIfOnGround(Collision2D collision)
