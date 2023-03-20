@@ -5,6 +5,8 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public float movementSpeed;
+    public float airMovementSpeed;
+    public float maxMoveSpeed = 10;
     public float jumpForce;
     float horizontal, vertical;
 
@@ -30,7 +32,15 @@ public class Player : MonoBehaviour
     void Update()
     {
         horizontal = Input.GetAxisRaw("Horizontal");
-        horizontalForce.x = horizontal * movementSpeed * Time.deltaTime;
+
+        if (isOnGround)
+        {
+            horizontalForce.x = horizontal * movementSpeed * Time.deltaTime;
+        }
+        else
+        {
+            horizontalForce.x = horizontal * airMovementSpeed * Time.deltaTime;
+        }
 
         body.AddForce(horizontalForce);
 
@@ -56,7 +66,12 @@ public class Player : MonoBehaviour
                 spriteRenderer.flipY= false;
         }
         if (isOnGround)
+        {
             spriteRenderer.flipY = false;
+        }
+
+        //limit velocity
+        body.velocity = Vector2.ClampMagnitude(body.velocity, maxMoveSpeed);
     }
 
     bool CanJump()

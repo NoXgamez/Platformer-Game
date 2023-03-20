@@ -8,6 +8,8 @@ TagManager:
   - Checkpoint
   - Collectable
   - Enemy
+  - Jump Pad
+  - Bounce
   layers:
   - Default
   - TransparentFX
